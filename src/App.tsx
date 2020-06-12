@@ -1,87 +1,34 @@
 import React from 'react';
 import './App.css';
 import { makeStyles } from '@material-ui/core/styles';
-import {
-    AppBar,
-    Container,
-    CssBaseline,
-    Divider,
-    Drawer,
-    IconButton,
-    List,
-    Toolbar,
-    Typography,
-} from '@material-ui/core';
-import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import MenuIcon from '@material-ui/icons/Menu';
-import clsx from 'clsx';
-import { BrowserRouter, Route, Router, Switch } from 'react-router-dom';
-
-const drawerWidth = 240;
+import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import { Header } from './components/Header/Header';
+import { SideDrawer } from './components/Drawer/SideDrawer';
+import { AppRoutes } from './constants/routes/AppRoutes';
+import { AdminLoginForm } from './containers/Auth/AdminLoginForm';
+import { ApotekaLoginForm } from './containers/Auth/ApotekaLoginForm';
+import { FarmaceutiContainer } from './containers/Farmaceuti/FarmaceutiContainer';
+import { LijekoviContainer } from './containers/Lijekovi/LijekoviContainer';
+import { UserContextProvider } from './service/providers/UserContextProvider';
+import { KategorijeContainer } from './containers/Kategorije/KategorijeContainer';
+import { NaciniPlacanjaContainer } from './containers/NaciniPlacanja/NaciniPlacanjaContainer';
+import { AdminiContainer } from './containers/Admini/AdminiContainer';
+import { PacijentiContainer } from './containers/Pacijenti/PacijentiContainer';
+import { ReceptiContainer } from './containers/Recepti/ReceptiContainer';
+import { KategorijaForm } from './containers/Kategorije/KategorijaForm';
+import { NacinPlacanjaForm } from './containers/NaciniPlacanja/NacinPlacanjaForm';
+import { AdminForm } from './containers/Admini/AdminForm';
+import { FarmaceutiForm } from './containers/Farmaceuti/FarmaceutiForm';
+import { PacijentForm } from "./containers/Pacijenti/PacijentForm";
 
 const useStyles = makeStyles(theme => ({
     root: {
         display: 'flex',
     },
-    toolbar: {
-        paddingRight: 24, // keep right padding when drawer closed
-    },
-    toolbarIcon: {
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'flex-end',
-        padding: '0 8px',
-        ...theme.mixins.toolbar,
-    },
-    appBar: {
-        zIndex: theme.zIndex.drawer + 1,
-        transition: theme.transitions.create(['width', 'margin'], {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.leavingScreen,
-        }),
-    },
-    appBarShift: {
-        marginLeft: drawerWidth,
-        width: `calc(100% - ${drawerWidth}px)`,
-        transition: theme.transitions.create(['width', 'margin'], {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.enteringScreen,
-        }),
-    },
-    menuButton: {
-        marginRight: 36,
-    },
-    menuButtonHidden: {
-        display: 'none',
-    },
-    title: {
-        flexGrow: 1,
-    },
-    drawerPaper: {
-        position: 'relative',
-        whiteSpace: 'nowrap',
-        width: drawerWidth,
-        transition: theme.transitions.create('width', {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.enteringScreen,
-        }),
-    },
-    drawerPaperClose: {
-        overflowX: 'hidden',
-        transition: theme.transitions.create('width', {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.leavingScreen,
-        }),
-        width: theme.spacing(7),
-        [theme.breakpoints.up('sm')]: {
-            width: theme.spacing(9),
-        },
-    },
-    appBarSpacer: theme.mixins.toolbar,
+    appBarSpacer: { ...theme.mixins.toolbar },
     content: {
         flexGrow: 1,
-        height: '100vh',
-        overflow: 'auto',
+        padding: theme.spacing(3),
     },
     container: {
         paddingTop: theme.spacing(4),
@@ -100,56 +47,40 @@ const useStyles = makeStyles(theme => ({
 
 const App: React.FC = () => {
     const classes = useStyles();
-    const [open, setOpen] = React.useState(true);
-    const handleDrawerOpen = () => {
-        setOpen(true);
-    };
-    const handleDrawerClose = () => {
-        setOpen(false);
-    };
-    const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
 
     return (
-        <BrowserRouter>
-            <div className={classes.root}>
-                <CssBaseline />
-                <AppBar position="absolute" className={clsx(classes.appBar, open && classes.appBarShift)}>
-                    <Toolbar className={classes.toolbar}>
-                        <IconButton
-                            edge="start"
-                            color="inherit"
-                            aria-label="open drawer"
-                            onClick={handleDrawerOpen}
-                            className={clsx(classes.menuButton, open && classes.menuButtonHidden)}>
-                            <MenuIcon />
-                        </IconButton>
-                        <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.title}>
-                            Apoteka
-                        </Typography>
-                    </Toolbar>
-                </AppBar>
-                <Drawer
-                    variant="permanent"
-                    classes={{
-                        paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose),
-                    }}
-                    open={open}>
-                    <div className={classes.toolbarIcon}>
-                        <IconButton onClick={handleDrawerClose}>
-                            <ChevronLeftIcon />
-                        </IconButton>
-                    </div>
-                    <Divider />
-                    {/*<List>{mainListItems}</List>*/}
-                    <Divider />
-                    {/*<List>{secondaryListItems}</List>*/}
-                </Drawer>
-                <main className={classes.content}>
-                    <div className={classes.appBarSpacer} />
-                    <Switch></Switch>
-                </main>
-            </div>
-        </BrowserRouter>
+        <UserContextProvider>
+            <BrowserRouter>
+                <div className={classes.root}>
+                    <Header />
+                    <SideDrawer />
+                    <main className={classes.content}>
+                        <div className={classes.appBarSpacer} />
+                        <Switch>
+                            <Route path={AppRoutes.AdminLogin} exact component={AdminLoginForm} />
+                            <Route path={AppRoutes.Admini} exact component={AdminiContainer} />
+                            <Route path={AppRoutes.AdminiNew} exact component={AdminForm} />
+                            <Route path={AppRoutes.AdminById} exact component={AdminForm} />
+                            <Route path={AppRoutes.Farmaceuti} exact component={FarmaceutiContainer} />
+                            <Route path={AppRoutes.FarmaceutiNew} exact component={FarmaceutiForm} />
+                            <Route path={AppRoutes.Kategorije} exact component={KategorijeContainer} />
+                            <Route path={AppRoutes.KategorijeNew} exact component={KategorijaForm} />
+                            <Route path={AppRoutes.KategorijaById} exac component={KategorijaForm} />
+                            <Route path={AppRoutes.NaciniPlacanja} exact component={NaciniPlacanjaContainer} />
+                            <Route path={AppRoutes.NaciniPlacanjaNew} exact component={NacinPlacanjaForm} />
+                            <Route path={AppRoutes.NaciniPlacanjaById} exact component={NacinPlacanjaForm} />
+                            <Route path={AppRoutes.ApotekaLogin} exact component={ApotekaLoginForm} />
+                            <Route path={AppRoutes.Lijekovi} exact component={LijekoviContainer} />
+                            <Route path={AppRoutes.Pacijenti} exact component={PacijentiContainer} />
+                            <Route path={AppRoutes.PacijentiNew} exact component={PacijentForm} />
+                            <Route path={AppRoutes.PacijentById} exact component={PacijentForm} />
+                            <Route path={AppRoutes.Recepti} exact component={ReceptiContainer} />
+                            {/*<Route exact path={[AppRoutes.Dashboard, '/']} component={AppDashboard} />*/}
+                        </Switch>
+                    </main>
+                </div>
+            </BrowserRouter>
+        </UserContextProvider>
     );
 };
 

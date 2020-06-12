@@ -1,68 +1,87 @@
 export interface Admin {
-  id?: number;
-  username: string;
-  password: string;
-  email: string;
+    adminId?: number;
+    username: string;
+    password: string;
+    email: string;
 }
 
 export interface Farmaceut {
-  id?: number;
-  username: string;
-  password: string;
-  email: string;
-  ime: string;
-  prezime: string;
-  brojDozvole: number;
+    farmaceutId?: number;
+    username: string;
+    password: string;
+    email: string;
+    ime: string;
+    prezime: string;
+    brojDozvole: string;
 }
 
 export interface Kategorija {
-  id?: number;
-  naziv: string;
-  opis: string;
+    kategorijaId?: number;
+    naziv: string;
+    opis: string;
 }
 
 export interface Lijek {
-  id?: number;
-  naziv: string;
-  opis: string;
-  kolicina: number;
-  cijena: number;
-  kategorija: Kategorija;
+    lijekId?: number;
+    naziv: string;
+    opis: string;
+    kolicina: number;
+    cijena: number;
+    kategorija: number;
 }
 
 export interface NacinPlacanja {
-  id?: number;
-  naziv: string;
-  opis: string;
+    nacinPlacanjaId?: number;
+    naziv: string;
+    opis: string;
 }
 
 export interface Pacijent {
-  id?: number;
-  ime: string;
-  prezime: string;
-  datum_rodjenja: Date;
-  sifra_zdravstvene: string;
+    pacijentId?: number;
+    ime: string;
+    prezime: string;
+    datumRodjenja: Date;
+    sifraZdravstvene: number;
 }
 
 export interface Recept {
-  id?: number;
-  sadrzaj: string;
-  datumIzdavanja: Date;
-  nazivUstanove: string;
-  pacijent: Pacijent;
+    receptId?: number;
+    sadrzaj: string;
+    datumIzdavanja: Date;
+    nazivUstanove: string;
+    pacijent: number;
 }
 
 export interface Racun {
-  id?: number;
-  datum: Date;
-  suma: number;
-  recept: Recept;
-  nacinPlacanja: NacinPlacanja;
-  farmaceut: Farmaceut;
+    id?: number;
+    datum: Date;
+    suma: number;
+    recept: Recept;
+    nacinPlacanja: NacinPlacanja;
+    farmaceut: Farmaceut;
 }
 
 export interface Prodaja {
-  id?: number;
-  racun: Racun;
-  lijek: Lijek;
+    prodajaId?: number;
+    racun: Racun;
+    lijek: Lijek;
+}
+
+export interface AuthUser {
+    username?: string;
+    password?: string;
+    email?: string;
+    role?: string;
+}
+
+export interface LoginModel {
+    username: string;
+    password: string;
+}
+
+export interface NotificationProps {
+    popupDuration?: number;
+    severity?: 'error' | 'warning' | 'success' | 'info';
+    message: string;
+    onClose(): void; // will invalidate the entire notification object so this can get freshly re-rendered
 }
