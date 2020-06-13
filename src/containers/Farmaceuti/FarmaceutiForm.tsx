@@ -2,14 +2,12 @@ import { Farmaceut, NotificationProps } from '../../constants/types';
 import React, { useEffect, useState } from 'react';
 import { useHistory, useRouteMatch } from 'react-router';
 import { Field, Form, Formik, FormikHelpers, FormikProps } from 'formik';
-import { yupValidationSchema } from './validation';
 import { makeStyles } from '@material-ui/core/styles';
 import { AppRoutes } from '../../constants/routes/AppRoutes';
-import { getKategorijaById } from '../../service/domain/KategorijeService';
-import { notifyOnReject } from '../../constants/AppUtils';
 import { Avatar, Button, Container, CssBaseline, LinearProgress, TextField, Typography } from '@material-ui/core';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import { Notification } from '../../components/Notification/Notification';
+import { yupValidationSchema } from './validation';
 
 const useStyles = makeStyles(theme => ({
     paper: {
@@ -95,7 +93,7 @@ const InnerForm = ({
                         variant="outlined"
                         margin="normal"
                         fullWidth
-                        password
+                        type="password"
                         name="password"
                         label="Password"
                         error={touched.password && !!errors.password}
@@ -141,7 +139,7 @@ const InnerForm = ({
                         type="submit"
                         fullWidth
                         variant="contained"
-                        color="primary"
+                        color="secondary"
                         className={classes.submit}
                         disabled={isSubmitting}>
                         {editing ? `Edituj farmaceuta` : 'Kreiraj farmaceuta    '}
@@ -166,17 +164,17 @@ export const FarmaceutiForm: React.FC<NotificationProps> = props => {
     const [notification, setNotification] = useState<NotificationProps | undefined>(undefined);
     const history = useHistory();
 
-    const handleSubmit = (values: Farmaceut, formikHelpers: FormikHelpers<Farmaceut>) => {
+    const handleOnSubmit = (values: Farmaceut, formikHelpers: FormikHelpers<Farmaceut>) => {
         console.log(values);
     };
 
     return (
         <Formik
-            validateOnChange={false}
             validateOnBlur={true}
+            validateOnChange={false}
             initialValues={defaultValues}
             validationSchema={yupValidationSchema}
-            onSubmit={(values, formikHelpers) => handleSubmit(values, formikHelpers)}>
+            onSubmit={(values, formikHelpers) => handleOnSubmit(values, formikHelpers)}>
             {formikProps => (
                 <InnerForm
                     {...formikProps}

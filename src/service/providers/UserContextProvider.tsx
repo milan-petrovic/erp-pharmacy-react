@@ -1,23 +1,32 @@
-import React, { Dispatch, SetStateAction } from 'react';
-import { createContext, ReactNode, useState } from 'react';
+import React, { createContext, ReactNode, useState } from 'react';
 import { AuthUser } from '../../constants/types';
 
 export interface UserContextType {
-    authenticated: false;
+    authenticated?: boolean;
     user?: AuthUser;
-    setUser?: Dispatch<SetStateAction<AuthUser | undefined>>;
-    setAuthenticated?: Dispatch<SetStateAction<boolean>>;
+    loginUser?: (user: AuthUser) => void;
+    logoutUser?: () => void;
 }
 
-export const UserContext = createContext<UserContextType>({ authenticated: false });
+export const UserContext = createContext<UserContextType>({});
 
 export const UserContextProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<AuthUser>();
-    const [authenticated, setAuthenticated] = useState<boolean>(false);
+    const [authenticated, setAuthenticated] = useState<boolean>();
+
+    const loginUser = (authUser: AuthUser) => {
+        setAuthenticated(true);
+        setUser(authUser);
+    };
+
+    const logoutUser = () => {
+        setAuthenticated(false);
+        setUser(undefined);
+    };
 
     return (
         <UserContext.Provider
-            value={{ authenticated: false, setAuthenticated: setAuthenticated, user: user, setUser: setUser }}>
+            value={{ authenticated: authenticated, user: user, loginUser: loginUser, logoutUser: logoutUser }}>
             {children}
         </UserContext.Provider>
     );

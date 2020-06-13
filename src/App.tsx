@@ -1,6 +1,6 @@
 import React from 'react';
 import './App.css';
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles, ThemeProvider } from '@material-ui/core/styles';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import { Header } from './components/Header/Header';
 import { SideDrawer } from './components/Drawer/SideDrawer';
@@ -19,7 +19,10 @@ import { KategorijaForm } from './containers/Kategorije/KategorijaForm';
 import { NacinPlacanjaForm } from './containers/NaciniPlacanja/NacinPlacanjaForm';
 import { AdminForm } from './containers/Admini/AdminForm';
 import { FarmaceutiForm } from './containers/Farmaceuti/FarmaceutiForm';
-import { PacijentForm } from "./containers/Pacijenti/PacijentForm";
+import { PacijentForm } from './containers/Pacijenti/PacijentForm';
+import { LijekoviForm } from './containers/Lijekovi/LijekoviForm';
+import { ReceptForm } from './containers/Recepti/ReceptForm';
+import { theme } from './constants/AppUtils';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -49,38 +52,44 @@ const App: React.FC = () => {
     const classes = useStyles();
 
     return (
-        <UserContextProvider>
-            <BrowserRouter>
-                <div className={classes.root}>
-                    <Header />
-                    <SideDrawer />
-                    <main className={classes.content}>
-                        <div className={classes.appBarSpacer} />
-                        <Switch>
-                            <Route path={AppRoutes.AdminLogin} exact component={AdminLoginForm} />
-                            <Route path={AppRoutes.Admini} exact component={AdminiContainer} />
-                            <Route path={AppRoutes.AdminiNew} exact component={AdminForm} />
-                            <Route path={AppRoutes.AdminById} exact component={AdminForm} />
-                            <Route path={AppRoutes.Farmaceuti} exact component={FarmaceutiContainer} />
-                            <Route path={AppRoutes.FarmaceutiNew} exact component={FarmaceutiForm} />
-                            <Route path={AppRoutes.Kategorije} exact component={KategorijeContainer} />
-                            <Route path={AppRoutes.KategorijeNew} exact component={KategorijaForm} />
-                            <Route path={AppRoutes.KategorijaById} exac component={KategorijaForm} />
-                            <Route path={AppRoutes.NaciniPlacanja} exact component={NaciniPlacanjaContainer} />
-                            <Route path={AppRoutes.NaciniPlacanjaNew} exact component={NacinPlacanjaForm} />
-                            <Route path={AppRoutes.NaciniPlacanjaById} exact component={NacinPlacanjaForm} />
-                            <Route path={AppRoutes.ApotekaLogin} exact component={ApotekaLoginForm} />
-                            <Route path={AppRoutes.Lijekovi} exact component={LijekoviContainer} />
-                            <Route path={AppRoutes.Pacijenti} exact component={PacijentiContainer} />
-                            <Route path={AppRoutes.PacijentiNew} exact component={PacijentForm} />
-                            <Route path={AppRoutes.PacijentById} exact component={PacijentForm} />
-                            <Route path={AppRoutes.Recepti} exact component={ReceptiContainer} />
-                            {/*<Route exact path={[AppRoutes.Dashboard, '/']} component={AppDashboard} />*/}
-                        </Switch>
-                    </main>
-                </div>
-            </BrowserRouter>
-        </UserContextProvider>
+        <ThemeProvider theme={theme}>
+            <UserContextProvider>
+                <BrowserRouter>
+                    <div className={classes.root}>
+                        <Header />
+                        <SideDrawer />
+                        <main className={classes.content}>
+                            <div className={classes.appBarSpacer} />
+                            <Switch>
+                                <Route path={AppRoutes.AdminLogin} exact component={AdminLoginForm} />
+                                <Route path={AppRoutes.Admini} exact component={AdminiContainer} />
+                                <Route path={AppRoutes.AdminiNew} exact component={AdminForm} />
+                                <Route path={AppRoutes.AdminById} exact component={AdminForm} />
+                                <Route path={AppRoutes.Farmaceuti} exact component={FarmaceutiContainer} />
+                                <Route path={AppRoutes.FarmaceutiNew} exact component={FarmaceutiForm} />
+                                <Route path={AppRoutes.Kategorije} exact component={KategorijeContainer} />
+                                <Route path={AppRoutes.KategorijeNew} exact component={KategorijaForm} />
+                                <Route path={AppRoutes.KategorijaById} exac component={KategorijaForm} />
+                                <Route path={AppRoutes.NaciniPlacanja} exact component={NaciniPlacanjaContainer} />
+                                <Route path={AppRoutes.NaciniPlacanjaNew} exact component={NacinPlacanjaForm} />
+                                <Route path={AppRoutes.NaciniPlacanjaById} exact component={NacinPlacanjaForm} />
+                                <Route path={AppRoutes.ApotekaLogin} exact component={ApotekaLoginForm} />
+                                <Route path={AppRoutes.Lijekovi} exact component={LijekoviContainer} />
+                                <Route path={AppRoutes.LijekoviNew} exact component={LijekoviForm} />
+                                <Route path={AppRoutes.LijekById} exact component={LijekoviForm} />
+                                <Route path={AppRoutes.Pacijenti} exact component={PacijentiContainer} />
+                                <Route path={AppRoutes.PacijentiNew} exact component={PacijentForm} />
+                                <Route path={AppRoutes.PacijentById} exact component={PacijentForm} />
+                                <Route path={AppRoutes.Recepti} exact component={ReceptiContainer} />
+                                <Route path={AppRoutes.ReceptiNew} exact component={ReceptForm} />
+                                <Route path={AppRoutes.ReceptById} exact component={ReceptForm} />
+                                {/*<Route exact path={[AppRoutes.Dashboard, '/']} component={AppDashboard} />*/}
+                            </Switch>
+                        </main>
+                    </div>
+                </BrowserRouter>
+            </UserContextProvider>
+        </ThemeProvider>
     );
 };
 

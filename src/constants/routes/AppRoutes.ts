@@ -18,9 +18,13 @@ export enum AppRoutes {
     FarmaceutiNew = '/admin/farmaceuti/new',
     ApotekaLogin = '/apoteka/login',
     Lijekovi = '/apoteka/lijekovi',
+    LijekoviNew = '/apoteka/lijekovi/new',
+    LijekById = '/apoteka/lijekovi/:id?',
     Prodaje = '/apoteka/prodaje',
     Pacijenti = '/apoteka/pacijenti',
     PacijentiNew = '/apoteka/pacijenti/new',
     PacijentById = '/apoteka/pacijenti/:id?',
     Recepti = '/apoteka/recepti',
+    ReceptiNew = '/apoteka/recepti/new',
+    ReceptById = '/apoteka/recepti/:id?',
 }

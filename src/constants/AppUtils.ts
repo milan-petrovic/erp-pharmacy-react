@@ -1,6 +1,7 @@
 import { format, parseISO } from 'date-fns';
 import { NotificationProps } from './types';
 import { AxiosError } from 'axios';
+import { createMuiTheme } from '@material-ui/core';
 
 export const drawerWidth = 240;
 
@@ -49,3 +50,21 @@ export const notifyOnReject = (
         }
     };
 };
+
+export const theme = createMuiTheme({
+    palette: {
+        type: 'dark',
+        primary: {
+            main: '#283943',
+            dark: '#112430',
+        },
+        secondary: {
+            main: '#09d989',
+            light: '#00000029',
+        },
+        background: {
+            default: '#112430',
+            paper: '#283943',
+        },
+    },
+});

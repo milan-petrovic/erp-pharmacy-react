@@ -49,7 +49,7 @@ export interface Recept {
     sadrzaj: string;
     datumIzdavanja: Date;
     nazivUstanove: string;
-    pacijent: number;
+    pacijentId: number;
 }
 
 export interface Racun {

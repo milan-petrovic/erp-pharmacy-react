@@ -8,7 +8,7 @@ import { yupValidationSchema } from './validation';
 import { Notification } from '../../components/Notification/Notification';
 import { adminLogin } from '../../service/domain/LoginService';
 import { UserContext } from '../../service/providers/UserContextProvider';
-import { Roles } from '../../constants/AppUtils';
+import { notifyOnReject, Roles } from '../../constants/AppUtils';
 import { useHistory } from 'react-router';
 import { AppRoutes } from '../../constants/routes/AppRoutes';
 
@@ -88,7 +88,7 @@ const InnerForm = ({
                         error={touched.password && !!errors.password}
                         helperText={touched.password && errors.password}
                     />
-                    <Button type="submit" fullWidth variant="contained" color="primary" className={classes.submit}>
+                    <Button type="submit" fullWidth variant="contained" color="secondary" className={classes.submit}>
                         Prijavi se
                     </Button>
                 </Form>
@@ -102,34 +102,27 @@ const defaultValues: LoginModel = {
 };
 
 export const AdminLoginForm: React.FC<NotificationProps> = props => {
-    const { authenticated, user, setUser, setAuthenticated } = useContext(UserContext);
+    const { loginUser, authenticated } = useContext(UserContext);
     const [notification, setNotification] = useState<NotificationProps | undefined>(undefined);
     const history = useHistory();
 
     const handleSubmit = (values: LoginModel, formikHelpers: FormikHelpers<LoginModel>) => {
         const { setSubmitting, resetForm } = formikHelpers;
-        console.log('pozvao login');
         adminLogin(values)
             .then(response => {
                 resetForm();
-                if (response.status === 200) {
-                    setUser &&
-                        setUser({
-                            username: response.data.username,
-                            password: response.data.password,
-                            email: response.data.email,
-                            role: Roles.ADMIN,
-                        });
-                    setAuthenticated && setAuthenticated(true);
-                    setTimeout(() => {
-                        history.push(AppRoutes.Farmaceuti);
-                    }, 5000);
-                }
+                loginUser &&
+                    loginUser({
+                        username: response.data.username,
+                        password: response.data.password,
+                        email: response.data.email,
+                        role: Roles.ADMIN,
+                    });
+                history.push(AppRoutes.Farmaceuti);
             })
-            .catch(error => console.log(error))
+            .catch(notifyOnReject(setNotification, 'Pogresan username ili password'))
             .finally(() => {
                 setSubmitting(false);
-                // <Redirect to={AppRoutes.Farmaceuti} />;
             });
     };
 

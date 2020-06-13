@@ -133,7 +133,7 @@ export const NaciniPlacanjaContainer: React.FC = () => {
                     <DialogTitle id="alert-dialog-title">Potvrda brisanja nacina placanja</DialogTitle>
                     <DialogContent>
                         <DialogContentText id="alert-dialog-description">
-                            {`Da li ste sigurni da zelite obrisati kategoriju ${dialog?.nacinPlacanja?.naziv}?`}
+                            {`Da li ste sigurni da zelite obrisati nacin placanja ${dialog?.nacinPlacanja?.naziv}?`}
                         </DialogContentText>
                     </DialogContent>
                     <DialogActions>

@@ -72,7 +72,7 @@ export const FarmaceutiContainer: React.FC = () => {
                             startIcon={<AddIcon />}
                             component={Link}
                             to={AppRoutes.FarmaceutiNew}>
-                            Kreiraj novog
+                            Dodaj
                         </Button>
                     </Grid>
                 </Grid>

@@ -1,7 +1,16 @@
-import React from 'react';
+import React, { useContext, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
-import { Avatar, Button, Container, CssBaseline, Grid, TextField, Typography } from '@material-ui/core';
+import { Avatar, Button, Container, CssBaseline, TextField, Typography } from '@material-ui/core';
+import { LoginModel, NotificationProps } from '../../constants/types';
+import { Field, Form, Formik, FormikHelpers, FormikProps } from 'formik';
+import { yupValidationSchema } from './validation';
+import { Notification } from '../../components/Notification/Notification';
+import { adminLogin, farmaceutLogin } from '../../service/domain/LoginService';
+import { UserContext } from '../../service/providers/UserContextProvider';
+import { notifyOnReject, Roles } from '../../constants/AppUtils';
+import { useHistory } from 'react-router';
+import { AppRoutes } from '../../constants/routes/AppRoutes';
 
 const useStyles = makeStyles(theme => ({
     paper: {
@@ -23,7 +32,17 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-export const ApotekaLoginForm: React.FC = () => {
+const InnerForm = ({
+    touched,
+    errors,
+    isValid,
+    setValues,
+    values,
+    isSubmitting,
+    setFieldValue,
+    notification,
+    setNotification,
+}: FormikProps<LoginModel> & { notification?: NotificationProps; setNotification: VoidFunction }) => {
     const classes = useStyles();
 
     return (
@@ -36,19 +55,29 @@ export const ApotekaLoginForm: React.FC = () => {
                 <Typography component="h1" variant="h5">
                     Prijavi se kao farmaceut
                 </Typography>
-                <form className={classes.form} noValidate>
-                    <TextField
+                {notification && (
+                    <Notification
+                        popupDuration={notification.popupDuration}
+                        message={notification.message}
+                        onClose={notification.onClose}
+                        severity={notification.severity}
+                    />
+                )}
+                <Form className={classes.form}>
+                    <Field
+                        as={TextField}
                         variant="outlined"
                         margin="normal"
                         required
                         fullWidth
-                        id="email"
-                        label="Email Address"
-                        name="email"
-                        autoComplete="email"
-                        autoFocus
+                        id="username"
+                        label="Username"
+                        name="username"
+                        error={touched.username && !!errors.username}
+                        helperText={touched.username && errors.username}
                     />
-                    <TextField
+                    <Field
+                        as={TextField}
                         variant="outlined"
                         margin="normal"
                         required
@@ -56,13 +85,62 @@ export const ApotekaLoginForm: React.FC = () => {
                         name="password"
                         label="Password"
                         type="password"
-                        id="password"
+                        error={touched.password && !!errors.password}
+                        helperText={touched.password && errors.password}
                     />
-                    <Button type="submit" fullWidth variant="contained" color="primary" className={classes.submit}>
+                    <Button type="submit" fullWidth variant="contained" color="secondary" className={classes.submit}>
                         Prijavi se
                     </Button>
-                </form>
+                </Form>
             </div>
         </Container>
+    );
+};
+const defaultValues: LoginModel = {
+    username: '',
+    password: '',
+};
+
+export const ApotekaLoginForm: React.FC<NotificationProps> = props => {
+    const { loginUser, authenticated } = useContext(UserContext);
+    const [notification, setNotification] = useState<NotificationProps | undefined>(undefined);
+    const history = useHistory();
+
+    const handleSubmit = (values: LoginModel, formikHelpers: FormikHelpers<LoginModel>) => {
+        const { setSubmitting, resetForm } = formikHelpers;
+        farmaceutLogin(values)
+            .then(response => {
+                resetForm();
+                loginUser &&
+                    loginUser({
+                        username: response.data.username,
+                        password: response.data.password,
+                        email: response.data.email,
+                        role: Roles.FARMACEUT,
+                    });
+                history.push(AppRoutes.Lijekovi);
+            })
+            .catch(notifyOnReject(setNotification, 'Pogresan username ili password'))
+            .finally(() => {
+                setSubmitting(false);
+            });
+    };
+
+    return (
+        <Formik
+            validateOnChange={false}
+            validateOnBlur={true}
+            initialValues={defaultValues}
+            validationSchema={yupValidationSchema}
+            onSubmit={(loginModel, formikHelpers) => handleSubmit(loginModel, formikHelpers)}>
+            {formikProps => (
+                <InnerForm
+                    {...formikProps}
+                    {...props}
+                    notification={notification}
+                    setNotification={setNotification as VoidFunction}
+                />
+            )}
+        </Formik>
     );
 };

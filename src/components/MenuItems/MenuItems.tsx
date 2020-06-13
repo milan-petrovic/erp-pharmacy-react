@@ -1,42 +1,53 @@
 import React, { useContext, useEffect } from 'react';
-import { ListItem, ListItemIcon, ListItemText } from '@material-ui/core';
+import { Divider, ListItem, ListItemIcon, ListItemText } from '@material-ui/core';
 import DashboardIcon from '@material-ui/icons/Dashboard';
-import { Link } from 'react-router-dom';
-import { Roles } from '../../constants/AppUtils';
+import { Link, useHistory } from 'react-router-dom';
+import { Roles, theme } from '../../constants/AppUtils';
 import { UserContext } from '../../service/providers/UserContextProvider';
+import { AppRoutes } from '../../constants/routes/AppRoutes';
+import PeopleIcon from '@material-ui/icons/People';
+import SupervisedUserCircleIcon from '@material-ui/icons/SupervisedUserCircle';
+import AppsIcon from '@material-ui/icons/Apps';
+import ExitToAppIcon from '@material-ui/icons/ExitToApp';
+import PaymentIcon from '@material-ui/icons/Payment';
+import AssignmentIndIcon from '@material-ui/icons/AssignmentInd';
+import AssignmentIcon from '@material-ui/icons/Assignment';
+import LocalHospitalIcon from '@material-ui/icons/LocalHospital';
 
 interface MainMenuItemsProps {
     role?: string;
 }
 
 export const MenuItems: React.FC<MainMenuItemsProps> = (props: MainMenuItemsProps) => {
-    const { authenticated, user } = useContext(UserContext);
+    const { authenticated, user, logoutUser } = useContext(UserContext);
+    const history = useHistory();
+
     useEffect(() => {}, [authenticated]);
     return (
         <>
             {props.role === Roles.FARMACEUT && (
                 <>
-                    <ListItem button component={Link} to="">
+                    <ListItem button component={Link} to={AppRoutes.Lijekovi}>
                         <ListItemIcon>
-                            <DashboardIcon />
+                            <LocalHospitalIcon />
                         </ListItemIcon>
                         <ListItemText primary="Lijekovi" />
                     </ListItem>
-                    <ListItem button component={Link} to="">
+                    <ListItem button component={Link} to={AppRoutes.Prodaje}>
                         <ListItemIcon>
-                            <DashboardIcon />
+                            <AssignmentIcon />
                         </ListItemIcon>
                         <ListItemText primary="Prodaje" />
                     </ListItem>
-                    <ListItem button component={Link} to="">
+                    <ListItem button component={Link} to={AppRoutes.Pacijenti}>
                         <ListItemIcon>
-                            <DashboardIcon />
+                            <PeopleIcon />
                         </ListItemIcon>
                         <ListItemText primary="Pacijetni" />
                     </ListItem>
-                    <ListItem button component={Link} to="">
+                    <ListItem button component={Link} to={AppRoutes.Recepti}>
                         <ListItemIcon>
-                            <DashboardIcon />
+                            <AssignmentIndIcon />
                         </ListItemIcon>
                         <ListItemText primary="Recepti" />
                     </ListItem>
@@ -44,29 +55,41 @@ export const MenuItems: React.FC<MainMenuItemsProps> = (props: MainMenuItemsProp
             )}
             {props.role === Roles.ADMIN && (
                 <>
-                    <ListItem button component={Link} to="">
+                    <ListItem button component={Link} to={AppRoutes.Farmaceuti}>
                         <ListItemIcon>
-                            <DashboardIcon />
+                            <PeopleIcon />
                         </ListItemIcon>
                         <ListItemText primary="Farmaceuti" />
                     </ListItem>
-                    <ListItem button component={Link} to="">
+                    <ListItem button component={Link} to={AppRoutes.Admini}>
                         <ListItemIcon>
-                            <DashboardIcon />
+                            <SupervisedUserCircleIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="Admini" />
+                    </ListItem>
+                    <ListItem button component={Link} to={AppRoutes.Kategorije}>
+                        <ListItemIcon>
+                            <AppsIcon />
                         </ListItemIcon>
                         <ListItemText primary="Kategorije" />
                     </ListItem>
-                    <ListItem button component={Link} to="">
+                    <ListItem button component={Link} to={AppRoutes.NaciniPlacanja}>
                         <ListItemIcon>
-                            <DashboardIcon />
+                            <PaymentIcon />
                         </ListItemIcon>
                         <ListItemText primary="Nacini placanja" />
                     </ListItem>
                 </>
             )}
-            <ListItem button component={Link} to="">
+            <Divider />
+            <ListItem
+                button
+                onClick={() => {
+                    logoutUser && logoutUser();
+                    history.push('/');
+                }}>
                 <ListItemIcon>
-                    <DashboardIcon />
+                    <ExitToAppIcon />
                 </ListItemIcon>
                 <ListItemText primary="Odjava" />
             </ListItem>

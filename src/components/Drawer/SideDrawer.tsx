@@ -6,7 +6,7 @@ import { MenuItems } from '../MenuItems/MenuItems';
 import { UserContext } from '../../service/providers/UserContextProvider';
 import { Link } from 'react-router-dom';
 import { AppRoutes } from '../../constants/routes/AppRoutes';
-import DashboardIcon from '@material-ui/icons/Dashboard';
+import VpnKeyIcon from '@material-ui/icons/VpnKey';
 
 const useStyles = makeStyles(theme => ({
     drawer: {
@@ -32,18 +32,18 @@ export const SideDrawer: React.FC = () => {
             anchor="left">
             <Divider />
             <List>
-                {authenticated && <List>{<MenuItems role={Roles.FARMACEUT} />}</List>}
+                {authenticated && <List>{<MenuItems role={user?.role} />}</List>}
                 {!authenticated && (
                     <>
                         <ListItem button component={Link} to={AppRoutes.AdminLogin}>
                             <ListItemIcon>
-                                <DashboardIcon />
+                                <VpnKeyIcon />
                             </ListItemIcon>
                             <ListItemText primary="Admin panel" />
                         </ListItem>
                         <ListItem button component={Link} to={AppRoutes.ApotekaLogin}>
                             <ListItemIcon>
-                                <DashboardIcon />
+                                <VpnKeyIcon />
                             </ListItemIcon>
                             <ListItemText primary="Apoteka" />
                         </ListItem>
