@@ -21,3 +21,7 @@ export const deleteLijek = (lijekId: number) => {
 export const putLijek = (requestData: Lijek) => {
     return axiosInstance.put('/lijekovi', requestData);
 };
+
+export const pretragaLijek = (kljucPretrage: string, vrijednost: string) => {
+    return axiosInstance.get(`/lijekovi/pretraga?${kljucPretrage}=${vrijednost}`);
+};

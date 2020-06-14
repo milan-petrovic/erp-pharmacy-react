@@ -15,9 +15,13 @@ export const postRecept = (requestData: Recept) => {
 };
 
 export const putRecept = (requestData: Recept) => {
-    return axiosInstance.post('/recepti', requestData);
+    return axiosInstance.put('/recepti', requestData);
 };
 
 export const deleteReceptById = (receptId: number) => {
     return axiosInstance.delete(`/recepti/${receptId}`);
+};
+
+export const pretragaRecepti = (kljucPretrage: string, vrijednost: string) => {
+    return axiosInstance.get(`/recepti/pretraga?${kljucPretrage}=${vrijednost}`);
 };

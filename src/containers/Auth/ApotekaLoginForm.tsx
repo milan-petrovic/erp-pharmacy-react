@@ -113,6 +113,7 @@ export const ApotekaLoginForm: React.FC<NotificationProps> = props => {
                 resetForm();
                 loginUser &&
                     loginUser({
+                        userId: response.data.farmaceutId,
                         username: response.data.username,
                         password: response.data.password,
                         email: response.data.email,
@@ -120,7 +121,7 @@ export const ApotekaLoginForm: React.FC<NotificationProps> = props => {
                     });
                 history.push(AppRoutes.Lijekovi);
             })
-            .catch(notifyOnReject(setNotification, 'Pogresan username ili password'))
+            .catch(notifyOnReject(setNotification, 'Pogresan username ili password. Pokusajte ponovo'))
             .finally(() => {
                 setSubmitting(false);
             });

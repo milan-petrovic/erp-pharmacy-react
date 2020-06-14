@@ -1,30 +1,42 @@
 import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { NacinPlacanja, NotificationProps, Pacijent } from "../../constants/types";
-import { deletePacijent, getAllPacijenti } from "../../service/domain/PacijentiService";
+import { Lijek, NacinPlacanja, NotificationProps, Pacijent } from '../../constants/types';
+import { deletePacijent, getAllPacijenti, pretragaPacijent } from '../../service/domain/PacijentiService';
 import {
     Button,
     Container,
-    CssBaseline, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle,
+    CssBaseline,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
     Grid,
     IconButton,
+    InputLabel,
+    MenuItem,
     Paper,
+    Select,
     Table,
     TableBody,
     TableCell,
     TableContainer,
     TableHead,
-    TableRow
-} from "@material-ui/core";
+    TableRow,
+    TextField,
+} from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';
-import { Link, useHistory, useLocation } from "react-router-dom";
+import { Link, useHistory, useLocation } from 'react-router-dom';
 import { AppRoutes } from '../../constants/routes/AppRoutes';
 import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
 import { getDateAsString } from '../../constants/AppUtils';
-import { Notification } from "../../components/Notification/Notification";
-import { deleteNaciniPlacanja } from "../../service/domain/NaciniPlacanjaService";
-import { AxiosError } from "axios";
+import { Notification } from '../../components/Notification/Notification';
+import { deleteNaciniPlacanja } from '../../service/domain/NaciniPlacanjaService';
+import { AxiosError, AxiosResponse } from 'axios';
+import SearchIcon from '@material-ui/icons/Search';
+import { getAllLijekovi, pretragaLijek } from '../../service/domain/LijekoviService';
+import LoopIcon from '@material-ui/icons/Loop';
 
 const useStyles = makeStyles(theme => ({
     table: {
@@ -50,7 +62,8 @@ export const PacijentiContainer: React.FC = () => {
     const [notification, setNotification] = useState<NotificationProps | undefined>(undefined);
     const [pacijenti, setPacijenti] = useState<Pacijent[]>();
     const [dialog, setDialog] = useState<{ open: boolean; pacijent: Pacijent | null }>();
-
+    const [kljucPretrage, setKljucPretrage] = useState<string>('ime');
+    const [vrijednostPretrage, setVrijednostPretrage] = useState<string>('');
 
     useEffect(() => {
         getPacijenti();
@@ -58,10 +71,10 @@ export const PacijentiContainer: React.FC = () => {
 
     const getPacijenti = () => {
         getAllPacijenti()
-          .then(response => {
-              setPacijenti(response.data);
-          })
-          .catch(error => console.log(error));
+            .then(response => {
+                setPacijenti(response.data);
+            })
+            .catch(error => console.log(error));
     };
 
     useEffect(() => {
@@ -73,33 +86,33 @@ export const PacijentiContainer: React.FC = () => {
 
     const handleOnDelete = (pacijentId: number, ime: string | undefined, prezime: string | undefined) => {
         deletePacijent(pacijentId)
-          .then(() => {
-              setNotification({
-                  message: `Uspjesno obrisan pacijent ${ime} ${prezime}`,
-                  onClose: () => setNotification(undefined),
-              });
-          })
-          .catch((error: AxiosError) => {
-              const errors = error.response?.data.errors;
-              if (errors && errors.length > 0) {
-                  setNotification({
-                      message: errors[0],
-                      severity: 'error',
-                      onClose: () => setNotification(undefined),
-                  });
-              } else {
-                  setNotification({
-                      message: `Greska prilikom brisanja pacijenta ${ime} ${prezime}`,
-                      severity: 'error',
-                      onClose: () => setNotification(undefined),
-                  });
-                  console.error(error.response?.data);
-              }
-          })
-          .finally(() => {
-              getPacijenti();
-              setDialog({ open: false, pacijent: null });
-          });
+            .then(() => {
+                setNotification({
+                    message: `Uspjesno obrisan pacijent ${ime} ${prezime}`,
+                    onClose: () => setNotification(undefined),
+                });
+            })
+            .catch((error: AxiosError) => {
+                const errors = error.response?.data.errors;
+                if (errors && errors.length > 0) {
+                    setNotification({
+                        message: errors[0],
+                        severity: 'error',
+                        onClose: () => setNotification(undefined),
+                    });
+                } else {
+                    setNotification({
+                        message: `Greska prilikom brisanja pacijenta ${ime} ${prezime}`,
+                        severity: 'error',
+                        onClose: () => setNotification(undefined),
+                    });
+                    console.error(error.response?.data);
+                }
+            })
+            .finally(() => {
+                getPacijenti();
+                setDialog({ open: false, pacijent: null });
+            });
     };
 
     const handleOpenDialog = (pacijent: Pacijent) => {
@@ -114,40 +127,107 @@ export const PacijentiContainer: React.FC = () => {
         <Container component="main" maxWidth="xl">
             <CssBaseline />
             {dialog && dialog.open && (
-              <Dialog
-                open={dialog.open}
-                onClose={handleCloseDialog}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description">
-                  <DialogTitle id="alert-dialog-title">Potvrda brisanja pacijenta</DialogTitle>
-                  <DialogContent>
-                      <DialogContentText id="alert-dialog-description">
-                          {`Da li ste sigurni da zelite obrisati pacijenta ${dialog?.pacijent?.ime} ${dialog?.pacijent?.prezime}?`}
-                      </DialogContentText>
-                  </DialogContent>
-                  <DialogActions>
-                      <Button
-                        size="large"
-                        onClick={() =>
-                          handleOnDelete(dialog?.pacijent?.pacijentId!, dialog?.pacijent?.ime, dialog?.pacijent?.prezime)
-                        }
-                        color="secondary">
-                          Potvrdi
-                      </Button>
-                      <Button size="large" onClick={() => handleCloseDialog()}>
-                          Odustani
-                      </Button>
-                  </DialogActions>
-              </Dialog>
+                <Dialog
+                    open={dialog.open}
+                    onClose={handleCloseDialog}
+                    aria-labelledby="alert-dialog-title"
+                    aria-describedby="alert-dialog-description">
+                    <DialogTitle id="alert-dialog-title">Potvrda brisanja pacijenta</DialogTitle>
+                    <DialogContent>
+                        <DialogContentText id="alert-dialog-description">
+                            {`Da li ste sigurni da zelite obrisati pacijenta ${dialog?.pacijent?.ime} ${dialog?.pacijent?.prezime}?`}
+                        </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button
+                            size="large"
+                            onClick={() =>
+                                handleOnDelete(
+                                    dialog?.pacijent?.pacijentId!,
+                                    dialog?.pacijent?.ime,
+                                    dialog?.pacijent?.prezime,
+                                )
+                            }
+                            color="secondary">
+                            Potvrdi
+                        </Button>
+                        <Button size="large" onClick={() => handleCloseDialog()}>
+                            Odustani
+                        </Button>
+                    </DialogActions>
+                </Dialog>
             )}
             {notification && (
-              <Notification
-                popupDuration={notification?.popupDuration}
-                message={notification?.message}
-                onClose={notification?.onClose}
-                severity={notification?.severity}
-              />
+                <Notification
+                    popupDuration={notification?.popupDuration}
+                    message={notification?.message}
+                    onClose={notification?.onClose}
+                    severity={notification?.severity}
+                />
             )}
+            <Paper className={classes.paper}>
+                <Grid container spacing={2} style={{ padding: 16 }}>
+                    <Grid item xs={12} sm={2} style={{ marginTop: -6 }}>
+                        <InputLabel id="search-type-select-label">Pretrazi prema</InputLabel>
+                        <Select
+                            labelId="search-type-select-label"
+                            id="search-type-select"
+                            fullWidth
+                            value={kljucPretrage}
+                            onChange={(evt: React.ChangeEvent<{ name?: string; value: unknown }>) => {
+                                const { value } = evt.target;
+                                if (typeof value === 'string') {
+                                    setKljucPretrage(value);
+                                }
+                            }}>
+                            <MenuItem value="ime">Ime</MenuItem>
+                            <MenuItem value="prezime">Prezime</MenuItem>
+                            <MenuItem value="sifraZdravstvene">Sifra zdravstvene</MenuItem>
+                        </Select>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                        <TextField
+                            color="secondary"
+                            variant="outlined"
+                            fullWidth
+                            size="small"
+                            label="Pretraga"
+                            value={vrijednostPretrage}
+                            onChange={event => setVrijednostPretrage(event.target.value)}
+                        />
+                    </Grid>
+                    <Grid item xs={12} sm={2}>
+                        <Button
+                            color="secondary"
+                            variant="contained"
+                            fullWidth
+                            startIcon={<SearchIcon />}
+                            onClick={() =>
+                                pretragaPacijent(kljucPretrage, vrijednostPretrage).then(
+                                    (response: AxiosResponse<Pacijent[]>) => {
+                                        setPacijenti([...response.data]);
+                                    },
+                                )
+                            }>
+                            Pretrazi
+                        </Button>
+                    </Grid>
+                    <Grid item xs={12} sm={2}>
+                        <Button
+                            color="secondary"
+                            variant="outlined"
+                            fullWidth
+                            startIcon={<LoopIcon />}
+                            onClick={() =>
+                                getAllPacijenti().then((response: AxiosResponse<Pacijent[]>) => {
+                                    setPacijenti([...response.data]);
+                                })
+                            }>
+                            Resetuj
+                        </Button>
+                    </Grid>
+                </Grid>
+            </Paper>
             <Paper className={classes.paper}>
                 <Grid container>
                     <Grid item xs={12} sm={9}></Grid>
@@ -185,10 +265,19 @@ export const PacijentiContainer: React.FC = () => {
                                         <TableCell align="left">{datumRodjenjaLocalString}</TableCell>
 
                                         <TableCell align="left">
-                                            <IconButton aria-label="Edit category" color="secondary" size="small" onClick={() => history.push(AppRoutes.Pacijenti + `/${pacijent.pacijentId}`)}>
+                                            <IconButton
+                                                aria-label="Edit category"
+                                                color="secondary"
+                                                size="small"
+                                                onClick={() =>
+                                                    history.push(AppRoutes.Pacijenti + `/${pacijent.pacijentId}`)
+                                                }>
                                                 <EditIcon />
                                             </IconButton>
-                                            <IconButton aria-label="Delete category" size="small" onClick={() => handleOpenDialog(pacijent)}>
+                                            <IconButton
+                                                aria-label="Delete category"
+                                                size="small"
+                                                onClick={() => handleOpenDialog(pacijent)}>
                                                 <DeleteIcon />
                                             </IconButton>
                                         </TableCell>

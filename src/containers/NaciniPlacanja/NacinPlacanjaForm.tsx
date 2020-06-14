@@ -108,7 +108,7 @@ const InnerForm = ({
                         type="submit"
                         fullWidth
                         variant="contained"
-                        color="primary"
+                        color="secondary"
                         className={classes.submit}
                         disabled={isSubmitting}>
                         {editing ? `Edituj nacin placanja` : 'Kreiraj nacin placanja'}

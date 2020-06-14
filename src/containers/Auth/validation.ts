@@ -8,6 +8,6 @@ export const yupValidationSchema: Yup.ObjectSchema = Yup.object().shape({
         .max(32),
     password: Yup.string()
         .required(requiredMessage)
-        .min(6, lengthConstraintMessage(6))
+        .min(8, lengthConstraintMessage(8))
         .max(32),
 });

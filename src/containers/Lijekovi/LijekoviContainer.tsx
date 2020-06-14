@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { deleteLijek, getAllLijekovi } from '../../service/domain/LijekoviService';
+import React, { useContext, useEffect, useState } from 'react';
+import { deleteLijek, getAllLijekovi, pretragaLijek } from '../../service/domain/LijekoviService';
 import { Kategorija, Lijek, NacinPlacanja, NotificationProps } from '../../constants/types';
 import { makeStyles } from '@material-ui/core/styles';
 import {
@@ -13,13 +13,17 @@ import {
     DialogTitle,
     Grid,
     IconButton,
+    InputLabel,
+    MenuItem,
     Paper,
+    Select,
     Table,
     TableBody,
     TableCell,
     TableContainer,
     TableHead,
     TableRow,
+    TextField,
 } from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';
 import { Link, useHistory, useLocation } from 'react-router-dom';
@@ -28,7 +32,10 @@ import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
 import { getAllKategorije, getKategorijaById } from '../../service/domain/KategorijeService';
 import { Notification } from '../../components/Notification/Notification';
-import { AxiosError } from 'axios';
+import { AxiosError, AxiosResponse } from 'axios';
+import { UserContext, UserContextProvider } from '../../service/providers/UserContextProvider';
+import SearchIcon from '@material-ui/icons/Search';
+import LoopIcon from '@material-ui/icons/Loop';
 
 const useStyles = makeStyles(theme => ({
     table: {
@@ -55,6 +62,10 @@ export const LijekoviContainer: React.FC = () => {
     const [dialog, setDialog] = useState<{ open: boolean; lijek: Lijek | null }>();
     const location = useLocation();
     const history = useHistory();
+    const [kljucPretrage, setKljucPretrage] = useState<string>('nazivLijeka');
+    const [vrijednostPretrage, setVrijednostPretrage] = useState<string>('');
+
+    const { user, authenticated } = useContext(UserContext);
 
     useEffect(() => {
         getLijekovi();
@@ -64,6 +75,8 @@ export const LijekoviContainer: React.FC = () => {
         getAllLijekovi()
             .then(response => {
                 setLijekovi(response.data);
+                console.log(user);
+                console.log(authenticated);
             })
             .catch(error => console.log(error));
     };
@@ -156,6 +169,67 @@ export const LijekoviContainer: React.FC = () => {
                     </DialogActions>
                 </Dialog>
             )}
+            <Paper className={classes.paper}>
+                <Grid container spacing={2} style={{ padding: 16 }}>
+                    <Grid item xs={12} sm={2} style={{ marginTop: -6 }}>
+                        <InputLabel id="search-type-select-label">Pretrazi prema</InputLabel>
+                        <Select
+                            labelId="search-type-select-label"
+                            id="search-type-select"
+                            fullWidth
+                            value={kljucPretrage}
+                            onChange={(evt: React.ChangeEvent<{ nazivLijeka?: string; value: unknown }>) => {
+                                const { value } = evt.target;
+                                if (typeof value === 'string') {
+                                    setKljucPretrage(value);
+                                }
+                            }}>
+                            <MenuItem value="nazivLijeka">Naziv lijeka</MenuItem>
+                        </Select>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                        <TextField
+                            color="secondary"
+                            variant="outlined"
+                            fullWidth
+                            size="small"
+                            label="Pretraga"
+                            value={vrijednostPretrage}
+                            onChange={event => setVrijednostPretrage(event.target.value)}
+                        />
+                    </Grid>
+                    <Grid item xs={12} sm={2}>
+                        <Button
+                            color="secondary"
+                            variant="contained"
+                            fullWidth
+                            startIcon={<SearchIcon />}
+                            onClick={() =>
+                                pretragaLijek(kljucPretrage, vrijednostPretrage).then(
+                                    (response: AxiosResponse<Lijek[]>) => {
+                                        setLijekovi([...response.data]);
+                                    },
+                                )
+                            }>
+                            Pretrazi
+                        </Button>
+                    </Grid>
+                    <Grid item xs={12} sm={2}>
+                        <Button
+                            color="secondary"
+                            variant="outlined"
+                            fullWidth
+                            startIcon={<LoopIcon />}
+                            onClick={() =>
+                                getAllLijekovi().then((response: AxiosResponse<Lijek[]>) => {
+                                    setLijekovi([...response.data]);
+                                })
+                            }>
+                            Resetuj
+                        </Button>
+                    </Grid>
+                </Grid>
+            </Paper>
             <Paper className={classes.paper}>
                 <Grid container>
                     <Grid item xs={12} sm={9}></Grid>

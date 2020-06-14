@@ -1,11 +1,16 @@
 import { NotificationProps, Pacijent, Recept } from '../../constants/types';
 import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { getAllRecepti } from '../../service/domain/ReceptiService';
+import { deleteReceptById, getAllRecepti } from '../../service/domain/ReceptiService';
 import {
     Button,
     Container,
     CssBaseline,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
     Grid,
     IconButton,
     Paper,
@@ -22,8 +27,9 @@ import { AppRoutes } from '../../constants/routes/AppRoutes';
 import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
 import { getDateAsString, getDateTimeAsString } from '../../constants/AppUtils';
-import { getAllPacijenti } from '../../service/domain/PacijentiService';
+import { deletePacijent, getAllPacijenti } from '../../service/domain/PacijentiService';
 import { Notification } from '../../components/Notification/Notification';
+import { AxiosError } from 'axios';
 
 const useStyles = makeStyles(theme => ({
     table: {
@@ -49,14 +55,19 @@ export const ReceptiContainer: React.FC = () => {
     const [notification, setNotification] = useState<NotificationProps | undefined>(undefined);
     const location = useLocation();
     const history = useHistory();
+    const [dialog, setDialog] = useState<{ open: boolean; recept: Recept | null }>();
 
     useEffect(() => {
+        getRecepti();
+    }, [pacijenti]);
+
+    const getRecepti = () => {
         getAllRecepti()
             .then(response => {
                 setRecepti(response.data);
             })
             .catch(error => console.log(error));
-    }, [pacijenti]);
+    };
 
     useEffect(() => {
         getAllPacijenti()
@@ -71,9 +82,73 @@ export const ReceptiContainer: React.FC = () => {
         }
     }, [location]);
 
+    const handleOpenDialog = (recept: Recept) => {
+        setDialog({ open: true, recept: recept });
+    };
+
+    const handleCloseDialog = () => {
+        setDialog({ open: false, recept: null });
+    };
+
+    const handleOnDelete = (receptId: number) => {
+        deleteReceptById(receptId)
+            .then(() => {
+                setNotification({
+                    message: `Uspjesno obrisan recept`,
+                    onClose: () => setNotification(undefined),
+                });
+            })
+            .catch((error: AxiosError) => {
+                const errors = error.response?.data.errors;
+                if (errors && errors.length > 0) {
+                    setNotification({
+                        message: errors[0],
+                        severity: 'error',
+                        onClose: () => setNotification(undefined),
+                    });
+                } else {
+                    setNotification({
+                        message: `Greska prilikom brisanja recepta}`,
+                        severity: 'error',
+                        onClose: () => setNotification(undefined),
+                    });
+                    console.error(error.response?.data);
+                }
+            })
+            .finally(() => {
+                getRecepti();
+                setDialog({ open: false, recept: null });
+            });
+    };
+
     return (
         <Container component="main" maxWidth="xl">
             <CssBaseline />
+            {dialog && dialog.open && (
+                <Dialog
+                    open={dialog.open}
+                    onClose={handleCloseDialog}
+                    aria-labelledby="alert-dialog-title"
+                    aria-describedby="alert-dialog-description">
+                    <DialogTitle id="alert-dialog-title">Potvrda brisanja recepta</DialogTitle>
+                    <DialogContent>
+                        <DialogContentText id="alert-dialog-description">
+                            {`Da li ste sigurni da zelite obrisati recept?`}
+                        </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button
+                            size="large"
+                            onClick={() => handleOnDelete(dialog?.recept?.receptId!)}
+                            color="secondary">
+                            Potvrdi
+                        </Button>
+                        <Button size="large" onClick={() => handleCloseDialog()}>
+                            Odustani
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+            )}
             {notification && (
                 <Notification
                     popupDuration={notification?.popupDuration}
@@ -133,7 +208,10 @@ export const ReceptiContainer: React.FC = () => {
                                                 onClick={() => history.push(AppRoutes.Recepti + `/${recept.receptId}`)}>
                                                 <EditIcon />
                                             </IconButton>
-                                            <IconButton aria-label="Delete category" size="small">
+                                            <IconButton
+                                                aria-label="Delete category"
+                                                size="small"
+                                                onClick={() => handleOpenDialog(recept)}>
                                                 <DeleteIcon />
                                             </IconButton>
                                         </TableCell>

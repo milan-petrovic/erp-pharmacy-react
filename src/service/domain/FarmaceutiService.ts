@@ -9,3 +9,15 @@ export const getAllFarmaceuti = (): Promise<AxiosResponse<Farmaceut[]>> => {
 export const postFarmaceut = (requestData: Farmaceut): Promise<AxiosResponse<Farmaceut>> => {
     return axiosInstance.post('/farmaceuti', requestData);
 };
+
+export const getFarmaceutById = (farmaceutId: number) => {
+    return axiosInstance.get(`/farmaceuti/${farmaceutId}`);
+};
+
+export const deleteFarmaceutById = (farmaceutId: number) => {
+    return axiosInstance.delete(`/farmaceuti/${farmaceutId}`);
+};
+
+export const putFarmaceut = (requestData: Farmaceut) => {
+    return axiosInstance.put('/farmaceuti', requestData);
+};

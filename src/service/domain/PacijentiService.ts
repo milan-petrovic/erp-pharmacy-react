@@ -1,6 +1,6 @@
-import { AxiosResponse } from "axios";
-import { Pacijent } from "../../constants/types";
-import { axiosInstance } from "../../api/axios";
+import { AxiosResponse } from 'axios';
+import { Pacijent } from '../../constants/types';
+import { axiosInstance } from '../../api/axios';
 
 export const getAllPacijenti = (): Promise<AxiosResponse<Pacijent[]>> => {
     return axiosInstance.get<Pacijent[]>('/pacijenti');
@@ -11,13 +11,17 @@ export const postPacijent = (requestData: Pacijent) => {
 };
 
 export const getPacijentById = (pacijentId: number) => {
-  return axiosInstance.get(`/pacijenti/${pacijentId}`);
+    return axiosInstance.get(`/pacijenti/${pacijentId}`);
 };
 
 export const putPacijent = (requestData: Pacijent) => {
-  return axiosInstance.put('/pacijenti', requestData);
+    return axiosInstance.put('/pacijenti', requestData);
 };
 
 export const deletePacijent = (pacijentId: number) => {
-  return axiosInstance.delete(`pacijenti/${pacijentId}`);
+    return axiosInstance.delete(`pacijenti/${pacijentId}`);
+};
+
+export const pretragaPacijent = (kljucPretrage: string, vrijednost: string) => {
+    return axiosInstance.get(`/pacijenti/pretraga?${kljucPretrage}=${vrijednost}`);
 };

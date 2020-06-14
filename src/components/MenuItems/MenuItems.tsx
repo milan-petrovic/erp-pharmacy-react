@@ -33,7 +33,7 @@ export const MenuItems: React.FC<MainMenuItemsProps> = (props: MainMenuItemsProp
                         </ListItemIcon>
                         <ListItemText primary="Lijekovi" />
                     </ListItem>
-                    <ListItem button component={Link} to={AppRoutes.Prodaje}>
+                    <ListItem button component={Link} to={AppRoutes.Racuni}>
                         <ListItemIcon>
                             <AssignmentIcon />
                         </ListItemIcon>

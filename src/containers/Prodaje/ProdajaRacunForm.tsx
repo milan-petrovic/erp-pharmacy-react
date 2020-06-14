@@ -1,9 +1,12 @@
-import { NotificationProps, Pacijent, Recept } from '../../constants/types';
-import React, { useEffect, useState } from 'react';
+import { NacinPlacanja, NotificationProps, Pacijent, Prodaja, Racun, Recept } from '../../constants/types';
+import React, { useContext, useEffect, useState } from 'react';
 import { useHistory, useRouteMatch } from 'react-router';
 import { Field, Form, Formik, FormikHelpers, FormikProps } from 'formik';
 import { makeStyles } from '@material-ui/core/styles';
 import { AppRoutes } from '../../constants/routes/AppRoutes';
+import { getAllRecepti, getReceptById } from '../../service/domain/ReceptiService';
+import { notifyOnReject } from '../../constants/AppUtils';
+import { getAllPacijenti } from '../../service/domain/PacijentiService';
 import {
     Avatar,
     Button,
@@ -24,10 +27,10 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import { Notification } from '../../components/Notification/Notification';
 import { KeyboardDatePicker, MuiPickersUtilsProvider } from '@material-ui/pickers';
 import DateFnsUtils from '@date-io/date-fns';
-import { getAllPacijenti, getPacijentById } from '../../service/domain/PacijentiService';
-import { yupValidationSchema } from './validation';
-import { getReceptById, postRecept, putRecept } from '../../service/domain/ReceptiService';
-import { notifyOnReject } from '../../constants/AppUtils';
+import { getAllNaciniPlacanja } from '../../service/domain/NaciniPlacanjaService';
+import { UserContext } from '../../service/providers/UserContextProvider';
+import { getLastRacun, postRacun } from '../../service/domain/ProdajeService';
+import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 
 const useStyles = makeStyles(theme => ({
     paper: {
@@ -58,42 +61,39 @@ const InnerForm = ({
     isSubmitting,
     notification,
     setNotification,
-}: FormikProps<Recept> & { notification?: NotificationProps; setNotification: VoidFunction }) => {
+}: FormikProps<Racun> & { notification?: NotificationProps; setNotification: VoidFunction }) => {
     const classes = useStyles();
     const matchId = useRouteMatch<{ id: string }>(AppRoutes.ReceptById)?.params.id;
-    const [editing, setEditing] = useState<boolean>(false);
     const [pacijenti, setPacijenti] = useState<Pacijent[]>();
-    const [datumIzdavanja, setDatumIzdavanja] = useState<Date>(new Date());
-
-    const getRecept = (id: number) => {
-        getReceptById(id)
-            .then(response => {
-                const { data } = response;
-                const { datumIzdavanja: datumIzdavanja } = data;
-                setDatumIzdavanja(new Date(datumIzdavanja));
-                setValues({ ...data });
-            })
-            .catch(notifyOnReject(setNotification));
-    };
+    const [recepti, setRecepti] = useState<Recept[]>();
+    const [naciniPlacanja, setNaciniPlacanja] = useState<NacinPlacanja[]>();
+    const [datum, setDatum] = useState<Date>(new Date());
 
     useEffect(() => {
-        if (matchId && !isNaN(Number(matchId))) {
-            getRecept(Number(matchId));
-            setEditing(true);
-        }
-    }, []);
-
-    useEffect(() => {
-        getAllPacijenti()
+        getAllRecepti()
             .then(response => {
-                setPacijenti(response.data);
+                setRecepti(response.data);
             })
             .catch(error => console.log(error));
     }, []);
 
     useEffect(() => {
-        setFieldValue('datumIzdavanja', datumIzdavanja.toISOString().split('.')[0]);
-    }, [datumIzdavanja]);
+        getAllPacijenti()
+            .then(response => setPacijenti(response.data))
+            .catch(notifyOnReject(setNotification));
+    }, []);
+
+    useEffect(() => {
+        getAllNaciniPlacanja()
+            .then(response => {
+                setNaciniPlacanja(response.data);
+            })
+            .catch(error => console.log(error));
+    }, []);
+
+    useEffect(() => {
+        setFieldValue('datum', datum.toISOString().split('T')[0]);
+    }, [datum]);
 
     return (
         <Container component="main" maxWidth="xs">
@@ -103,7 +103,7 @@ const InnerForm = ({
                     <LockOutlinedIcon />
                 </Avatar>
                 <Typography component="h1" variant="h5">
-                    {editing ? `Edituj recept` : `Kreiraj novi recept`}
+                    Kreiraj novu prodaju
                 </Typography>
                 {notification && (
                     <Notification
@@ -114,58 +114,54 @@ const InnerForm = ({
                     />
                 )}
                 <Form className={classes.form}>
-                    <Field
-                        as={TextField}
-                        variant="outlined"
-                        margin="normal"
-                        required
-                        fullWidth
-                        multiline
-                        rows="8"
-                        id="sadrzaj"
-                        label="Sadrzaj recepta"
-                        name="sadrzaj"
-                        error={touched.sadrzaj && !!errors.sadrzaj}
-                        helperText={touched.sadrzaj && errors.sadrzaj}
-                    />
-                    <Field
-                        as={TextField}
-                        variant="outlined"
-                        margin="normal"
-                        fullWidth
-                        required
-                        name="nazivUstanove"
-                        label="Naziv ustanove"
-                        error={touched.nazivUstanove && !!errors.nazivUstanove}
-                        helperText={touched.nazivUstanove && errors.nazivUstanove}
-                    />
                     <Grid item xs={12}>
                         <FormControl style={{ minWidth: '100%' }}>
-                            <InputLabel
-                                shrink={!!values.pacijentId}
-                                required
-                                error={touched.pacijentId && !!errors.pacijentId}
-                                id="category-label">
-                                Pacijent
+                            <InputLabel shrink={!!values.nacinPlacanja} required id="category-label">
+                                Nacin placanja
                             </InputLabel>
                             <Field
                                 id="category-select"
                                 as={Select}
                                 labelId="category-label"
-                                name="pacijentId"
-                                error={touched.pacijentId && !!errors.pacijentId}
+                                name="nacinPlacanja"
                                 input={<Input />}
                                 fullWidth
                                 MenuProps={MenuProps}>
-                                {pacijenti?.map(pacijent => (
-                                    <MenuItem key={pacijent.pacijentId} value={pacijent.pacijentId}>
-                                        {pacijent.ime + ' ' + pacijent.prezime}
+                                {naciniPlacanja?.map(nacinPlacanja => (
+                                    <MenuItem key={nacinPlacanja.nacinPlacanjaId} value={nacinPlacanja.nacinPlacanjaId}>
+                                        {nacinPlacanja.naziv}
                                     </MenuItem>
                                 ))}
                             </Field>
-                            {touched.pacijentId && errors?.pacijentId ? (
-                                <FormHelperText error>{errors.pacijentId}</FormHelperText>
-                            ) : null}
+                        </FormControl>
+                    </Grid>
+                    <Grid item xs={12}>
+                        <FormControl style={{ minWidth: '100%' }}>
+                            <InputLabel shrink={!!values.recept} required id="category-label">
+                                Recept
+                            </InputLabel>
+                            <Field
+                                id="category-select"
+                                as={Select}
+                                labelId="category-label"
+                                name="recept"
+                                input={<Input />}
+                                fullWidth
+                                MenuProps={MenuProps}>
+                                {recepti?.map(recept => {
+                                    let imeIPrezime;
+                                    pacijenti?.forEach(pacijent => {
+                                        if (pacijent.pacijentId === recept.receptId) {
+                                            imeIPrezime = pacijent.ime + ' ' + pacijent.prezime;
+                                        }
+                                    });
+                                    return (
+                                        <MenuItem key={recept.receptId} value={recept.receptId}>
+                                            {imeIPrezime + ' - ' + recept.nazivUstanove}
+                                        </MenuItem>
+                                    );
+                                })}
+                            </Field>
                         </FormControl>
                     </Grid>
                     <MuiPickersUtilsProvider utils={DateFnsUtils}>
@@ -177,8 +173,8 @@ const InnerForm = ({
                                 format="dd/MM/yyyy"
                                 disabled
                                 fullWidth
-                                value={datumIzdavanja}
-                                onChange={date => date && setDatumIzdavanja(date)}
+                                value={datum}
+                                onChange={date => date && setDatum(date)}
                                 KeyboardButtonProps={{
                                     'aria-label': 'change date',
                                 }}
@@ -188,11 +184,12 @@ const InnerForm = ({
                     <Button
                         type="submit"
                         fullWidth
-                        variant="contained"
+                        endIcon={<NavigateNextIcon />}
+                        variant="outlined"
                         color="secondary"
                         className={classes.submit}
                         disabled={isSubmitting}>
-                        {editing ? `Edituj recept` : 'Kreiraj recept'}
+                        Odaberi lijekove
                     </Button>
                     <LinearProgress color="secondary" hidden={!isSubmitting} />
                 </Form>
@@ -212,49 +209,27 @@ const MenuProps = {
     },
 };
 
-const defaultValues: Recept = {
-    sadrzaj: '',
-    nazivUstanove: '',
-    pacijentId: 0,
-    datumIzdavanja: new Date(),
+const defaultValues: Racun = {
+    datum: new Date(),
+    suma: 0,
+    nacinPlacanja: 0,
+    farmaceut: 0,
+    recept: undefined,
 };
 
-export const ReceptForm: React.FC<NotificationProps> = props => {
+export const ProdajaRacunForm: React.FC<NotificationProps> = props => {
     const [notification, setNotification] = useState<NotificationProps | undefined>(undefined);
     const history = useHistory();
+    const { user } = useContext(UserContext);
 
-    const handleSubmit = (values: Recept, formikHelpers: FormikHelpers<Recept>) => {
-        const { setSubmitting, resetForm } = formikHelpers;
+    const handleSubmit = (values: Racun, formikHelpers: FormikHelpers<Racun>) => {
+        values.farmaceut = user?.userId;
 
-        setSubmitting(true);
-
-        if (values.receptId != null) {
-            putRecept(values)
-                .then(_ => {
-                    resetForm();
-                    history.push(AppRoutes.Recepti, {
-                        message: 'Uspjesno azuriran recept',
-                        popupDuration: 5000,
-                    });
-                })
-                .catch(notifyOnReject(setNotification))
-                .finally(() => {
-                    setSubmitting(false);
-                });
-        } else {
-            postRecept(values)
-                .then(_ => {
-                    resetForm();
-                    history.push(AppRoutes.Recepti, {
-                        message: 'Uspjesno kreiran recept',
-                        popupDuration: 5000,
-                    });
-                })
-                .catch(notifyOnReject(setNotification))
-                .finally(() => {
-                    setSubmitting(false);
-                });
-        }
+        postRacun(values)
+            .then(response => {
+                history.push(AppRoutes.ProdajeNewLijek);
+            })
+            .catch(notifyOnReject(setNotification));
     };
 
     return (
@@ -262,7 +237,6 @@ export const ReceptForm: React.FC<NotificationProps> = props => {
             validateOnBlur={true}
             validateOnChange={false}
             initialValues={defaultValues}
-            validationSchema={yupValidationSchema}
             onSubmit={(values, formikHelpers) => handleSubmit(values, formikHelpers)}>
             {formikProps => (
                 <InnerForm

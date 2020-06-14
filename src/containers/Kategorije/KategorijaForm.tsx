@@ -131,7 +131,6 @@ export const KategorijaForm: React.FC<NotificationProps> = props => {
         const { setSubmitting, resetForm } = formikHelpers;
 
         setSubmitting(true);
-
         if (values.kategorijaId != null) {
             putKategorija(values)
                 .then(_ => {

@@ -12,7 +12,7 @@ export interface Farmaceut {
     email: string;
     ime: string;
     prezime: string;
-    brojDozvole: string;
+    brojDozvole: number;
 }
 
 export interface Kategorija {
@@ -53,21 +53,22 @@ export interface Recept {
 }
 
 export interface Racun {
-    id?: number;
+    racunId?: number;
     datum: Date;
     suma: number;
-    recept: Recept;
-    nacinPlacanja: NacinPlacanja;
-    farmaceut: Farmaceut;
+    recept?: number;
+    nacinPlacanja: number;
+    farmaceut?: number;
 }
 
 export interface Prodaja {
     prodajaId?: number;
-    racun: Racun;
-    lijek: Lijek;
+    racun: number;
+    lijek: number;
 }
 
 export interface AuthUser {
+    userId?: number;
     username?: string;
     password?: string;
     email?: string;

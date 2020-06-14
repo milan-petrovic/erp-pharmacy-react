@@ -12,4 +12,5 @@ export const yupValidationSchema: Yup.ObjectSchema = Yup.object().shape({
         .max(32),
     sifraZdravstvene: Yup.number()
         .required(requiredMessage)
+        .min(11, lengthConstraintMessage(11)),
 });

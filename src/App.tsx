@@ -18,11 +18,14 @@ import { ReceptiContainer } from './containers/Recepti/ReceptiContainer';
 import { KategorijaForm } from './containers/Kategorije/KategorijaForm';
 import { NacinPlacanjaForm } from './containers/NaciniPlacanja/NacinPlacanjaForm';
 import { AdminForm } from './containers/Admini/AdminForm';
-import { FarmaceutiForm } from './containers/Farmaceuti/FarmaceutiForm';
 import { PacijentForm } from './containers/Pacijenti/PacijentForm';
 import { LijekoviForm } from './containers/Lijekovi/LijekoviForm';
 import { ReceptForm } from './containers/Recepti/ReceptForm';
 import { theme } from './constants/AppUtils';
+import { ProdajaRacunForm } from './containers/Prodaje/ProdajaRacunForm';
+import { ProdajaLijekovi } from './containers/Prodaje/ProdajaLijekovi';
+import { RacuniContainer } from './containers/Prodaje/RacuniContainer';
+import { FarmaceutForm } from './containers/Farmaceuti/FarmaceutForm';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -66,7 +69,8 @@ const App: React.FC = () => {
                                 <Route path={AppRoutes.AdminiNew} exact component={AdminForm} />
                                 <Route path={AppRoutes.AdminById} exact component={AdminForm} />
                                 <Route path={AppRoutes.Farmaceuti} exact component={FarmaceutiContainer} />
-                                <Route path={AppRoutes.FarmaceutiNew} exact component={FarmaceutiForm} />
+                                <Route path={AppRoutes.FarmaceutiNew} exact component={FarmaceutForm} />
+                                <Route path={AppRoutes.FarmaceutById} exact component={FarmaceutForm} />
                                 <Route path={AppRoutes.Kategorije} exact component={KategorijeContainer} />
                                 <Route path={AppRoutes.KategorijeNew} exact component={KategorijaForm} />
                                 <Route path={AppRoutes.KategorijaById} exac component={KategorijaForm} />
@@ -83,6 +87,9 @@ const App: React.FC = () => {
                                 <Route path={AppRoutes.Recepti} exact component={ReceptiContainer} />
                                 <Route path={AppRoutes.ReceptiNew} exact component={ReceptForm} />
                                 <Route path={AppRoutes.ReceptById} exact component={ReceptForm} />
+                                <Route path={AppRoutes.ProdajeNewRacun} exact component={ProdajaRacunForm} />
+                                <Route path={AppRoutes.ProdajeNewLijek} exact component={ProdajaLijekovi} />
+                                <Route path={AppRoutes.Racuni} exact component={RacuniContainer} />
                                 {/*<Route exact path={[AppRoutes.Dashboard, '/']} component={AppDashboard} />*/}
                             </Switch>
                         </main>
