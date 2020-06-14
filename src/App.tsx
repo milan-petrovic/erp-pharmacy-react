@@ -26,6 +26,7 @@ import { ProdajaRacunForm } from './containers/Prodaje/ProdajaRacunForm';
 import { ProdajaLijekovi } from './containers/Prodaje/ProdajaLijekovi';
 import { RacuniContainer } from './containers/Prodaje/RacuniContainer';
 import { FarmaceutForm } from './containers/Farmaceuti/FarmaceutForm';
+import { HomePage } from './components/HomePage';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -64,7 +65,7 @@ const App: React.FC = () => {
                         <main className={classes.content}>
                             <div className={classes.appBarSpacer} />
                             <Switch>
-                                <Route path={AppRoutes.AdminLogin} exact component={AdminLoginForm} />
+                                <Route path={['/', AppRoutes.AdminLogin]} exact component={AdminLoginForm} />
                                 <Route path={AppRoutes.Admini} exact component={AdminiContainer} />
                                 <Route path={AppRoutes.AdminiNew} exact component={AdminForm} />
                                 <Route path={AppRoutes.AdminById} exact component={AdminForm} />
@@ -90,7 +91,7 @@ const App: React.FC = () => {
                                 <Route path={AppRoutes.ProdajeNewRacun} exact component={ProdajaRacunForm} />
                                 <Route path={AppRoutes.ProdajeNewLijek} exact component={ProdajaLijekovi} />
                                 <Route path={AppRoutes.Racuni} exact component={RacuniContainer} />
-                                {/*<Route exact path={[AppRoutes.Dashboard, '/']} component={AppDashboard} />*/}
+                                <Route exact path="/" component={HomePage} />
                             </Switch>
                         </main>
                     </div>
