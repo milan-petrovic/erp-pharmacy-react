@@ -26,7 +26,6 @@ import { ProdajaRacunForm } from './containers/Prodaje/ProdajaRacunForm';
 import { ProdajaLijekovi } from './containers/Prodaje/ProdajaLijekovi';
 import { RacuniContainer } from './containers/Prodaje/RacuniContainer';
 import { FarmaceutForm } from './containers/Farmaceuti/FarmaceutForm';
-import { HomePage } from './components/HomePage';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -91,7 +90,6 @@ const App: React.FC = () => {
                                 <Route path={AppRoutes.ProdajeNewRacun} exact component={ProdajaRacunForm} />
                                 <Route path={AppRoutes.ProdajeNewLijek} exact component={ProdajaLijekovi} />
                                 <Route path={AppRoutes.Racuni} exact component={RacuniContainer} />
-                                <Route exact path="/" component={HomePage} />
                             </Switch>
                         </main>
                     </div>
